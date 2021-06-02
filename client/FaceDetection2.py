@@ -44,9 +44,9 @@ def detect():
         # Stop if escape key is pressed
         k = cv2.waitKey(30) & 0xff
         if k == 27:
-            break
+            cap.release()
+            return
     # Release the VideoCapture object
-    cap.release()
 
 
 detect()
