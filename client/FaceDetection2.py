@@ -1,12 +1,10 @@
+import time
+
 import cv2
-import face_recognition
-import pyrebase
 from config import *
 from datetime import datetime
 import uuid
 
-path_on_cloud = "test/test.png"
-path_local = "download.jpg"
 
 
 def detect():
@@ -17,11 +15,12 @@ def detect():
     # To use a video file as input
     # cap = cv2.VideoCapture('filename.mp4')
     face_cascade = cv2.CascadeClassifier(
-        "xmls/haarcascade_frontalface_default.xml")
+        r"../xmls/haarcascade_frontalface_default.xml")
     eye_cascade = cv2.CascadeClassifier(
-        'xmls/haarcascade_eye.xml')
+        '../xmls/haarcascade_eye.xml')
 
     while True:
+        time.sleep(1)
         # Read the frame
         _, img = cap.read()
         # Convert to grayscale
@@ -35,7 +34,7 @@ def detect():
             # Display
             uid = uuid.uuid4()
             path_local = f"captured2\\person_{i}.jpg"
-            dest_path = f'{path_on_cloud}/entranceCam/{uid}_{datetime.now().isoformat()}'
+            dest_path = f'{path_on_cloud}/entranceCam/{uid}_{datetime.now().isoformat()}.jpg'
             cv2.imwrite(path_local, roi)
 
             # upload to server
