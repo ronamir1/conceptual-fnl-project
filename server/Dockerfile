@@ -11,13 +11,18 @@ RUN  apt-get -y install build-essential cmake git
 RUN  apt-get -y install libopenblas-dev liblapack-dev
 RUN  apt-get -y install libx11-dev libgtk-3-dev
 
+COPY requirements.txt /app/requirements.txt
+WORKDIR /app
+RUN pip install -r requirements.txt
+COPY . /app
+
 # Install production dependencies.
 RUN pip install cmake flask dlib face-recognition face-recognition-models gunicorn opencv-python pyrebase5
 
 
 # Copy local code to the container image.
-WORKDIR /app
-COPY . .
+#WORKDIR /app
+#COPY . .
 
 # Service must listen to $PORT environment variable.
 # This default value facilitates local development.
