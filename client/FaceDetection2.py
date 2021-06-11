@@ -6,7 +6,6 @@ from datetime import datetime
 import uuid
 
 
-
 def detect():
     # Load the cascade
 
@@ -36,10 +35,8 @@ def detect():
             path_local = f"captured2\\person_{i}.jpg"
             dest_path = f'{path_on_cloud}/entranceCam/{uid}_{datetime.now().isoformat()}.jpg'
             cv2.imwrite(path_local, roi)
-
             # upload to server
             storage.child(dest_path).put(path_local)
-
         cv2.imshow('img', img)
         # Stop if escape key is pressed
         k = cv2.waitKey(30) & 0xff
