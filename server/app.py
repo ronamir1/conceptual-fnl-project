@@ -19,6 +19,10 @@ firebase = pyrebase.initialize_app(config)
 storage = firebase.storage()
 ENTRANCE = 'entranceCam'
 PAID = 'paidCam'
+UNKNOWN_IMAGE = 'Unknown image, added to suspect list'
+PASSENGER_PAID = 'Passenger paid, removed from suspect list'
+KNOWN_PASSENGER = 'Known Passenger, photo was not added'
+BAD_IMAGE = 'Bad Image - cannot recognize face in image'
 
 
 def _compare_face(known_images, image_to_check):
@@ -27,111 +31,61 @@ def _compare_face(known_images, image_to_check):
     return result
 
 
-@app.route('/upload', methods=['POST'])
-def upload():
-    image_name = request.form.get('image_url')
-    bus_id = request.form.get('bus_id')
-    cam_type = request.form.get('cam_type')
-    image_url = f'{bus_id}/{cam_type}/{image_name}'
-    Path(image_url).parent.mkdir(parents=True, exist_ok=True)
+def get_request_args(form):
+    return form.get('image_url'), form.get('bus_id'), form.get('cam_type')
+
+
+def get_image_encodings(image_url):
     storage.child(image_url).download(image_url)
     new_image = face_recognition.load_image_file(image_url)
-    new_image_encodings = face_recognition.face_encodings(new_image)
+    return face_recognition.face_encodings(new_image)
 
-    if not new_image_encodings:
-        storage.delete(image_url)
-        return {'Result': 'Unrecognized image'}, 200
-    path_on_cloud = f'{bus_id}/{ENTRANCE}'
+
+def get_known_images_and_urls(path_on_cloud, image_name):
     known_images = []
     urls = []
     for f in storage.bucket.list_blobs(prefix=path_on_cloud):
-        if not f.name.endswith('.jpg') or f.name == image_name:
-            continue
-        Path(f.name).parent.mkdir(parents=True, exist_ok=True)
-        storage.child(f.name).download(f.name)
-        old_image = face_recognition.load_image_file(f.name)
-        old_encodings = face_recognition.face_encodings(old_image)
-        if not old_encodings:
-            continue
-        urls.append(f.name)
-        known_images.extend(old_encodings)
-        # res = _compare_face(new_image, old_image)
-        # if res:
-        #     if cam_type == PAID:
-        #         storage.delete(f.name)
-        #         paid = True
-        #         continue
-        #     storage.delete(image_url)
-        #     return {"Result": 'Known image'}, 200
-    result = _compare_face(known_images, new_image_encodings[0])
-    response = {'Result': 'Unknown image'}, 200
-    for url, res in zip(urls, result):
+        if f.name.endswith('.jpg') and f.name != path_on_cloud+"/"+image_name:
+            Path(f.name).parent.mkdir(parents=True, exist_ok=True)
+            old_encodings = get_image_encodings(f.name)
+            if old_encodings:
+                urls.append(f.name)
+                known_images.extend(old_encodings)
+    return known_images, urls
+
+
+def generate_response(urls, results, cam_type, image_url):
+    response = {'Result': UNKNOWN_IMAGE}, 200
+    for url, res in zip(urls, results):
         if res:
             storage.delete(url)
             if cam_type == PAID:
-                response = {'Result': 'User paid'}, 200
-
+                response = {'Result': PASSENGER_PAID}, 200
+            else:
+                response = {'Result': KNOWN_PASSENGER}, 200
     if cam_type == PAID:
         storage.delete(image_url)
     return response
 
 
-@app.route("/compare", methods=["POST"])
-def compare_faces():
-    """HTTP Cloud Function.
-    Args:
-        request (flask.Request): The request object.
-        <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
-    Returns:
-        The response text, or any set of values that can be turned into a
-        Response object using `make_response`
-        <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
-    """
-    origin = request.form.get("origin")
-    dest = request.form.get("dest")
-    for f in storage.bucket.list_blobs(prefix=origin):
-        if not f.name.endswith('.jpg'):
-            continue
-        fname = f.name.replace(':', '-')
-        Path(fname).parent.mkdir(parents=True, exist_ok=True)
-        storage.child(f.name).download(fname)
-    for f in storage.bucket.list_blobs(prefix=dest):
-        if not f.name.endswith('.jpg'):
-            continue
-        fname = f.name.replace(':', '-')
-        Path(fname).parent.mkdir(parents=True, exist_ok=True)
-        storage.child(f.name).download(fname)
-    results = {}
-    for f1 in os.listdir(origin):
-        if f1.endswith(".jpg"):
-            known_image = face_recognition.load_image_file(os.path.join(origin, f1))
-            for f2 in os.listdir(dest):
-                if f1.endswith(".jpg"):
-                    unknown_image = face_recognition.load_image_file(os.path.join(dest, f2))
-                    file_encodings = face_recognition.face_encodings(known_image)
-                    file_encoding = file_encodings[0]
-                    file2_encoding = face_recognition.face_encodings(unknown_image)
-                    if len(file2_encoding) == 0:
-                        print("unknown file" + f2 + " was not recognized")
-                    else:
-                        result = face_recognition.compare_faces([file_encoding], file2_encoding[0])
-                        results[origin + f1] = result
-                        print(f'{f2} result is {result}')
+@app.route('/upload', methods=['POST'])
+def upload():
+    image_name, bus_id, cam_type = get_request_args(request.form)
 
-    return results
+    image_url = f'{bus_id}/{cam_type}/{image_name}'
+    path_on_cloud = f'{bus_id}/{ENTRANCE}'
 
-    # known_image = face_recognition.load_image_file(f.name)
-    # for file2 in os.listdir("../client/captured2"):
-    #     if f.endswith(".jpg"):
-    #         unknown_image = face_recognition.load_image_file("captured2\\" + file2)
-    #         file_encoding = face_recognition.face_encodings(known_image)[0]
-    #         file2_encoding = face_recognition.face_encodings(unknown_image)
-    #         if len(file2_encoding) == 0:
-    #             print("unknown file" + file2 + " was not recognized")
-    #         else:
-    #             results = face_recognition.compare_faces([file_encoding], file2_encoding[0])
-    #             print(results)
+    Path(image_url).parent.mkdir(parents=True, exist_ok=True)
+    new_image_encodings = get_image_encodings(image_url)
 
+    if not new_image_encodings:
+        storage.delete(image_url)
+        return {'Result': BAD_IMAGE}, 200
+
+    known_images, urls = get_known_images_and_urls(path_on_cloud, image_name)
+
+    results = _compare_face(known_images, new_image_encodings[0])
+    return generate_response(urls, results, cam_type, image_url)
 
 @app.route("/", methods=["GET"])
 def hello():
