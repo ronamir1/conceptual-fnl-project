@@ -27,7 +27,6 @@ BAD_IMAGE = 'Bad Image - cannot recognize face in image'
 
 def _compare_face(known_images, image_to_check):
     result = face_recognition.compare_faces(known_images, image_to_check)
-    print(result)
     return result
 
 
@@ -45,7 +44,7 @@ def get_known_images_and_urls(path_on_cloud, image_name):
     known_images = []
     urls = []
     for f in storage.bucket.list_blobs(prefix=path_on_cloud):
-        if f.name.endswith('.jpg') and f.name != path_on_cloud+"/"+image_name:
+        if f.name.endswith('.jpg') and f.name != path_on_cloud + "/" + image_name:
             Path(f.name).parent.mkdir(parents=True, exist_ok=True)
             old_encodings = get_image_encodings(f.name)
             if old_encodings:
@@ -60,9 +59,11 @@ def generate_response(urls, results, cam_type, image_url):
         if res:
             storage.delete(url)
             if cam_type == PAID:
-                response = {'Result': PASSENGER_PAID}, 200
+                storage.delete(image_url)
+                return {'Result': PASSENGER_PAID}, 200
+
             else:
-                response = {'Result': KNOWN_PASSENGER}, 200
+                return {'Result': KNOWN_PASSENGER}, 200
     if cam_type == PAID:
         storage.delete(image_url)
     return response
@@ -86,6 +87,7 @@ def upload():
 
     results = _compare_face(known_images, new_image_encodings[0])
     return generate_response(urls, results, cam_type, image_url)
+
 
 @app.route("/", methods=["GET"])
 def hello():
