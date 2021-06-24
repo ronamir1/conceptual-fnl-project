@@ -38,7 +38,7 @@ def detect(face_cascade):
             # Display
             uid = uuid.uuid4()
             path_local = f"person_{i}.jpg"
-            image_name = f'{uid}_{datetime.now().isoformat().replace(":", "-")}.jpg'
+            image_name = f'{uid}${datetime.now().isoformat().replace(":", "-")}$.jpg'
             dest_path = f'{bus_id}/{cam_type}/{image_name}'
             cv2.imwrite(path_local, roi)
             # upload to server
