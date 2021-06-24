@@ -1,5 +1,4 @@
 from flask import Flask, request
-import os
 import pyrebase
 import face_recognition
 from pathlib import Path
@@ -32,7 +31,7 @@ def _compare_face(known_images, image_to_check):
 
 
 def get_request_args(form):
-    return form.get('image_url'), form.get('bus_id'), form.get('cam_type')
+    return form.get('image_url')
 
 
 def get_image_encodings(image_url):
@@ -71,9 +70,9 @@ def generate_response(urls, results, cam_type, image_url):
     return response
 
 
-@app.route('/upload', methods=['POST'])
-def upload():
-    image_name, bus_id, cam_type = get_request_args(request.form)
+@app.route('/upload/<bus_id>/<cam_type>/<i>', methods=['POST'])
+def upload(bus_id, cam_type, i):
+    image_name = get_request_args(request.form)
 
     image_url = f'{bus_id}/{cam_type}/{image_name}'
     path_on_cloud = f'{bus_id}/{ENTRANCE}'

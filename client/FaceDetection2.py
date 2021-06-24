@@ -16,6 +16,12 @@ def detect(face_cascade):
     # cap = cv2.VideoCapture('filename.mp4')
 
     while True:
+        # Stop if escape key is pressed
+        k = cv2.waitKey(30) & 0xff
+        if k == 27:
+            cap.release()
+            return
+
         time.sleep(0.5)
         # Read the frame
         _, img = cap.read()
@@ -37,10 +43,8 @@ def detect(face_cascade):
             cv2.imwrite(path_local, roi)
             # upload to server
             storage.child(dest_path).put(path_local)
-            data = {'image_url': image_name,
-                    'bus_id': bus_id,
-                    'cam_type': cam_type}
-            r = requests.post(f'{BASE_API}/upload', data=data)
+            data = {'image_url': image_name}
+            r = requests.post(f'{BASE_API}/upload/{bus_id}/{cam_type}/{index}', data=data)
             if not r.ok:
                 if cam_type == "entranceCam":
                     storage.delete(dest_path)
@@ -49,11 +53,6 @@ def detect(face_cascade):
             response = r.json()
             print(response)
         # cv2.imshow('img', img)
-        # Stop if escape key is pressed
-        k = cv2.waitKey(30) & 0xff
-        if k == 27:
-            cap.release()
-            return
 
 
 # Release the VideoCapture object
