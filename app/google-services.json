@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1093381045628",
+    "project_id": "inspectorapp-6d1d7",
+    "storage_bucket": "inspectorapp-6d1d7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1093381045628:android:b20e215054750bc93538f9",
+        "android_client_info": {
+          "package_name": "com.example.catchingcomputersapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1093381045628-uhvd2i6mi225214pf2chqajgpft9kqc4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtszmj7dV3MvDhiLwKHkA2hI56Syq5vLc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1093381045628-uhvd2i6mi225214pf2chqajgpft9kqc4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
