@@ -92,7 +92,6 @@ public class picturesActivity  extends AppCompatActivity {
                             Matcher matcher = pattern.matcher(uri.toString());
                             matcher.find();
                             String group = matcher.group(1);
-
                             imgTimeStamps.add(group);
                             imgDataUrls.add(new ImgDataUrl(uri.toString()));
                             myAdapter.notifyItemInserted(imgDataUrls.size() - 1);
