@@ -10,4 +10,7 @@ config = {"apiKey": "AIzaSyCM1MwSxh3NGOJ5MuumUcRmlZKs_b5Sp0g",
           "measurementId": "G-33MMBH01LN"}
 firebase = pyrebase.initialize_app(config)
 storage = firebase.storage()
-path_on_cloud = "bus_xxx"
+bus_id = "bus_xxx"
+cam_type = 'entranceCam'
+xml_path = r"../xmls/haarcascade_frontalface_default.xml"
+BASE_API = r'https://inspector-service-354e3fpima-ew.a.run.app'
