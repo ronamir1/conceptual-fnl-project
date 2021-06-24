@@ -23,6 +23,7 @@ UNKNOWN_IMAGE = 'Unknown image, added to suspect list'
 PASSENGER_PAID = 'Passenger paid, removed from suspect list'
 KNOWN_PASSENGER = 'Known Passenger, photo was not added'
 BAD_IMAGE = 'Bad Image - cannot recognize face in image'
+UNKNOWN_IMAGE_PAID = 'Unknown image, Passenger was not detected on entrance'
 
 
 def _compare_face(known_images, image_to_check):
@@ -66,6 +67,7 @@ def generate_response(urls, results, cam_type, image_url):
                 return {'Result': KNOWN_PASSENGER}, 200
     if cam_type == PAID:
         storage.delete(image_url)
+        return {'Result': UNKNOWN_IMAGE_PAID}, 200
     return response
 
 
@@ -100,3 +102,4 @@ if __name__ == "__main__":
     # Used when running locally only. When deploying to Cloud Run,
     # a webserver process such as Gunicorn will serve the app.
     app.run(host="localhost", port=8080, debug=True)
+1
