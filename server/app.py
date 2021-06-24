@@ -99,5 +99,5 @@ def hello():
 if __name__ == "__main__":
     # Used when running locally only. When deploying to Cloud Run,
     # a webserver process such as Gunicorn will serve the app.
-    app.run(host="localhost", port=8080, debug=True)
+    app.run(host="localhost", port=8080, threaded=True, processes=3, debug=True)
 1

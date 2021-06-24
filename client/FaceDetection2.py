@@ -34,6 +34,7 @@ def detect(face_cascade):
             # cv2.rectangle(img, (x - 0.5 * w, y - 0.5 * h), (x + 1.5 * w, y + 1.5 * h), (255, 0, 0), 2)
             roi = img[y - int(0.5 * h): y + int(1.5 * h), x - int(0.5 * w):x + int(1.5 * w)]
             if roi.size == 0:
+                print(roi)
                 continue
             # Display
             uid = uuid.uuid4()
@@ -46,6 +47,7 @@ def detect(face_cascade):
             data = {'image_url': image_name}
             r = requests.post(f'{BASE_API}/upload/{bus_id}/{cam_type}/{index}', data=data)
             if not r.ok:
+                print(r.reason)
                 if cam_type == "entranceCam":
                     storage.delete(dest_path)
                 continue

@@ -64,5 +64,5 @@ substitutions:
   _SERVICE_NAME: inspector-service
 
 images:
-  - "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA"
+  - "gcr.io/$PROJECT_ID/${_SERVICE_NAME}"
 # [END cloudrun_django_cloudmigrate]
