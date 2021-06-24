@@ -45,7 +45,10 @@ def detect(face_cascade):
                     'cam_type': cam_type}
             r = requests.post(f'{BASE_API}/upload', data=data)
             if not r.ok:
-                storage.child(dest_path).delete(path_local)
+                if cam_type == "entranceCam":
+                    storage.child(dest_path).delete(path_local)
+                continue
+
             response = r.json()
             print(response)
         # cv2.imshow('img', img)
