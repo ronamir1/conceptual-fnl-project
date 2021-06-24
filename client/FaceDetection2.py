@@ -27,17 +27,14 @@ def detect(face_cascade):
         for i, (x, y, w, h) in enumerate(faces):
             # cv2.rectangle(img, (x - 0.5 * w, y - 0.5 * h), (x + 1.5 * w, y + 1.5 * h), (255, 0, 0), 2)
             roi = img[y - int(0.5 * h): y + int(1.5 * h), x - int(0.5 * w):x + int(1.5 * w)]
+            if roi.size == 0:
+                continue
             # Display
             uid = uuid.uuid4()
             path_local = f"person_{i}.jpg"
             image_name = f'{uid}_{datetime.now().isoformat().replace(":", "-")}.jpg'
             dest_path = f'{bus_id}/{cam_type}/{image_name}'
-            try:
-                cv2.imwrite(path_local, roi)
-            except Exception as e:
-                print(roi)
-                print(str(e))
-                continue
+            cv2.imwrite(path_local, roi)
             # upload to server
             storage.child(dest_path).put(path_local)
             data = {'image_url': image_name,
@@ -45,7 +42,7 @@ def detect(face_cascade):
                     'cam_type': cam_type}
             r = requests.post(f'{BASE_API}/upload', data=data)
             if not r.ok:
-                storage.child(dest_path).delete(path_local)
+                storage.delete(dest_path)
             response = r.json()
             print(response)
         # cv2.imshow('img', img)
