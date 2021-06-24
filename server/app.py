@@ -54,7 +54,6 @@ def get_known_images_and_urls(path_on_cloud, image_name):
 
 
 def generate_response(urls, results, cam_type, image_url):
-    response = {'Result': UNKNOWN_IMAGE}, 200
     for url, res in zip(urls, results):
         if res:
             storage.delete(url)
@@ -67,7 +66,7 @@ def generate_response(urls, results, cam_type, image_url):
     if cam_type == PAID:
         storage.delete(image_url)
         return {'Result': UNKNOWN_IMAGE_PAID}, 200
-    return response
+    return {'Result': UNKNOWN_IMAGE}, 200
 
 
 @app.route('/upload/<bus_id>/<cam_type>/<i>', methods=['POST'])

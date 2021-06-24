@@ -14,6 +14,6 @@ firebase = pyrebase.initialize_app(config)
 storage = firebase.storage()
 bus_id = 1234
 index = 1
-cam_type = 'entranceCam'
+cam_type = 'paidCam'
 xml_path = r"../xmls/haarcascade_frontalface_default.xml"
 BASE_API = r'https://inspector-service-354e3fpima-ew.a.run.app'
