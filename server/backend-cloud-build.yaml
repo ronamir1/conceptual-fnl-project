@@ -19,25 +19,25 @@ steps:
     entrypoint: "bash"
     args:
       [
-        "-c",
-        "docker pull gcr.io/${PROJECT_ID}/${_SERVICE_NAME}:latest || exit 0",
+          "-c",
+          "docker pull gcr.io/${PROJECT_ID}/${_SERVICE_NAME}:latest || exit 0",
       ]
 
   - id: "build image"
     name: "gcr.io/cloud-builders/docker"
     args:
       [
-        "build",
-        "-t",
-        "gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}",
-        "--cache-from",
-        "gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}:latest",
-        ".",
+          "build",
+          "-t",
+          "gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}",
+          "--cache-from",
+          "gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}:latest",
+          ".",
       ]
 
   - id: "push image"
     name: "gcr.io/cloud-builders/docker"
-    args: ["push", "gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}"]
+    args: [ "push", "gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}" ]
 
 
   # Deploy container image to Cloud Run
@@ -45,16 +45,15 @@ steps:
     name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
-    - "run"
-    - "deploy"
-    - "${_SERVICE_NAME}"
-    - "--image"
-    - "gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}"
-    - "--region"
-    - "${_REGION}"
-    - "--platform"
-    - "managed"
-
+      - "run"
+      - "deploy"
+      - "${_SERVICE_NAME}"
+      - "--image"
+      - "gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}"
+      - "--region"
+      - "${_REGION}"
+      - "--platform"
+      - "managed"
 
 
 

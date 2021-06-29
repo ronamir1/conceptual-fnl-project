@@ -2,7 +2,8 @@ from flask import Flask, request
 import pyrebase
 import face_recognition
 from pathlib import Path
-
+import httplib2shim
+httplib2shim.patch()
 app = Flask(__name__)
 
 config = {"apiKey": "AIzaSyCM1MwSxh3NGOJ5MuumUcRmlZKs_b5Sp0g",
@@ -99,5 +100,4 @@ def hello():
 if __name__ == "__main__":
     # Used when running locally only. When deploying to Cloud Run,
     # a webserver process such as Gunicorn will serve the app.
-    app.run(host="localhost", port=8080, threaded=True, processes=3, debug=True)
-1
+    app.run(host="0.0.0.0", port=8080, threaded=True, debug=True)

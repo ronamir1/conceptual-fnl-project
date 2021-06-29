@@ -5,6 +5,9 @@ from client.config import *
 from datetime import datetime
 import uuid
 import requests
+import httplib2shim
+httplib2shim.patch()
+
 
 
 def detect(face_cascade):
@@ -22,7 +25,7 @@ def detect(face_cascade):
             cap.release()
             return
 
-        time.sleep(0.5)
+        time.sleep(1)
         # Read the frame
         _, img = cap.read()
         # Convert to grayscale
@@ -34,7 +37,7 @@ def detect(face_cascade):
             # cv2.rectangle(img, (x - 0.5 * w, y - 0.5 * h), (x + 1.5 * w, y + 1.5 * h), (255, 0, 0), 2)
             roi = img[y - int(0.5 * h): y + int(1.5 * h), x - int(0.5 * w):x + int(1.5 * w)]
             if roi.size == 0:
-                print(roi)
+                print("face was not detected")
                 continue
             # Display
             uid = uuid.uuid4()
